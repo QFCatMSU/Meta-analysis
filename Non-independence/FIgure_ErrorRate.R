@@ -1,0 +1,183 @@
+#Define the layout of multiple panel figure using layout matrix#
+layout.mat = rbind(c(1:3),c(1:3),c(1:3),c(4:6),c(4:6),c(4:6),c(7:9),c(7:9),c(7:9),c(10:12),c(10:12),c(10:12),c(19:21),c(13:15),c(13:15),c(13:15),c(16:18),c(16:18),c(16:18))
+
+#Set up plotting device and figure margins#
+quartz(w=9, h=10)
+layout(mat=layout.mat)
+par(mar=c(0,0,0,0), oma=c(4,4,3,2))
+
+
+
+#######################
+##Independent studies##
+#######################
+load("IIDStudy.RData")
+
+#Calculate error rate, and the confidence interval of error rate#
+error = array(dim=c(scenario, 5))
+error.ci = array(dim=c(scenario, 5))
+#cover is an interger indicating whether the confidence interval cover the true mean of 0#
+#If a confidence inteval covers 0, cover should be equal to 2#
+cover = (parm.low<0) + (parm.up>0)
+for(i in 1:scenario){
+	error[i,] = 1-colSums(cover[i,,]==2,na.rm=T)/iteration
+	error.ci[i,] = qnorm(0.975)*sqrt(error[i,]*(1-error[i,])/iteration)
+}
+
+#Find which sample (row in rmse and error rate) corresponds to each paper size#
+#Each size is plotted in a separate panel#
+size = array(dim=c(6,scenario/3))
+size[1,] = with(parm, which(mu==0.5))
+size[2,] = with(parm, which(mu==4.5))
+size[3,] = with(parm, which(mu==14.5))
+
+#Number of studies per paper and associated standard devation#
+#Used later for labelling each panel#
+paper.mean = c(1.5,5.5,15.5)
+paper.sd = c(1.11,7.02,18.68)
+
+for(i in 1:3){
+	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,6*(scenario/3-1)+5.5), ylim=c(0,0.11), pch=19, axes=F)
+	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0)
+	box()
+	abline(h=0.05, lty=2, col="grey")
+	if(i == 1){axis(2, at=c(0,0.04,0.08), tck=-0.03)}
+	for(j in 2:length(size[i,])){
+		#Plot subsequent scenarios equally spaced on the figure#
+		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19)\\
+		#Plot error bar#
+		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0)
+		abline(v=6*(j-1), lty=2, col="grey")
+	}
+	mtext(paste0("Mean:",paper.mean[i]),side=1,adj=0.95,line=-2.3, cex=0.75)
+	mtext(paste0("SD:",paper.sd[i]),side=1, adj=0.95,line=-1.3, cex=0.75)
+	mtext(expression(tau==0.1), side=3, adj=0.1, cex=0.8, line=-1.4)
+	mtext(expression(tau==0.5), side=3, adj=0.5, cex=0.8, line=-1.4)
+	mtext(expression(tau==1), side=3, adj=0.9, cex=0.8, line=-1.4)
+}
+
+
+#######################
+##Equally correlated studies##
+#######################
+load("EqualStudy.RData")
+
+#Calculate error rate and the confidence interval of error rate#
+error = array(dim=c(scenario, 5))
+error.ci = array(dim=c(scenario, 5))
+cover = (parm.low<0) + (parm.up>0)
+for(i in 1:scenario){
+	error[i,] = 1-colSums(cover[i,,]==2,na.rm=T)/iteration
+	error.ci[i,] = qnorm(0.975)*sqrt(error[i,]*(1-error[i,])/iteration)
+}
+
+#Find which sample corresponds to each paper size#
+size = array(dim=c(9,3))
+size[1,] = with(parm, which(mu==0.5 & rho.e==0.1))
+size[2,] = with(parm, which(mu==4.5 & rho.e==0.1))
+size[3,] = with(parm, which(mu==14.5 & rho.e==0.1))
+size[4,] = with(parm, which(mu==0.5 & rho.e==0.5))
+size[5,] = with(parm, which(mu==4.5 & rho.e==0.5))
+size[6,] = with(parm, which(mu==14.5 & rho.e==0.5))
+size[7,] = with(parm, which(mu==0.5 & rho.e==0.9))
+size[8,] = with(parm, which(mu==4.5 & rho.e==0.9))
+size[9,] = with(parm, which(mu==14.5 & rho.e==0.9))
+
+paper.mean = rep(c(1.5,5.5,15.5), times=3)
+paper.sd = rep(c(1.11,7.02,18.68), times=3)
+
+for(i in 1:9){
+	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,17.5), ylim=c(0,0.11), pch=19, axes=F)
+	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0)
+	box()
+	abline(h=0.05, lty=2, col="grey")
+	if(i %in% c(1,4,7)){axis(2, at=c(0,0.04, 0.08), tck=-0.03)}
+	if(i %in% c(7,8,9)){axis(1, at=c(1:5,7:11,13:17), tck=-0.03, labels=rep(c("1","2","3","4","5"), times=3), cex.axis=0.8)}
+	for(j in 2:length(size[i,])){
+		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19)
+		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0)
+		abline(v=6*(j-1), lty=2, col="grey")
+	}
+	mtext(paste0("Mean:",paper.mean[i]),side=1,adj=0.95,line=-2.3, cex=0.75)
+	mtext(paste0("SD:",paper.sd[i]),side=1, adj=0.95,line=-1.3, cex=0.75)
+	mtext(expression(tau==0.1), side=3, adj=0.1, cex=0.8, line=-1.4)
+	mtext(expression(tau==0.5), side=3, adj=0.5, cex=0.8, line=-1.4)
+	mtext(expression(tau==1), side=3, adj=0.9, cex=0.8, line=-1.4)
+	if(i %in% c(1,2,3)){mtext(expression(rho==0.1), side=1, adj=0.5, cex=0.8, line=-1.3)}
+	if(i %in% c(4,5,6)){mtext(expression(rho==0.5), side=1, adj=0.5, cex=0.8, line=-1.3)}
+	if(i %in% c(7,8,9)){mtext(expression(rho==0.9), side=1, adj=0.5, cex=0.8, line=-1.3)}
+}
+
+
+##################################
+## Unequally correlated studies ##
+##################################
+
+#Load results from simulations that allow tau to vary#
+#Because different simulation files using the same variable name, save results in new variable os that it can be plotted together with the unequal study with constant tau across paper scenario#
+load("UnequalStudy_VaryTau.RData")
+error.varytau = array(dim=c(scenario,5))
+error.ci.varytau = array(dim=c(scenario,5))
+cover.varytau = (parm.low<0) + (parm.up>0)
+
+for(i in 1:scenario){
+	error.varytau[i,] = 1-colSums(cover[i,,]==2,na.rm=T)/iteration #Error rate#
+	error.ci.varytau[i,] = qnorm(0.975)*sqrt(error[i,]*(1-error[i,])/iteration) #Lenght of CI of the error rate#
+}
+
+load("UnequalStudy.RData")
+
+#Calculate error rate and the confidence interval of error rate#
+error = array(dim=c(scenario, 5))
+error.ci = array(dim=c(scenario, 5))
+cover = (parm.low<0) + (parm.up>0)
+for(i in 1:scenario){
+	error[i,] = 1-colSums(cover[i,,]==2,na.rm=T)/iteration
+	error.ci[i,] = qnorm(0.975)*sqrt(error[i,]*(1-error[i,])/iteration)
+}
+
+#Find which sample corresponds to each paper size#
+size = array(dim=c(6,3))
+size[1,] = with(parm, which(mu==0.5 & rho.e==0.1))
+size[2,] = with(parm, which(mu==4.5 & rho.e==0.1))
+size[3,] = with(parm, which(mu==14.5 & rho.e==0.1))
+size[4,] = with(parm, which(mu==0.5 & rho.e==0.6))
+size[5,] = with(parm, which(mu==4.5 & rho.e==0.6))
+size[6,] = with(parm, which(mu==14.5 & rho.e==0.6))
+
+paper.mean = rep(c(1.5,5.5,15.5), times=2)
+paper.sd = rep(c(1.11,7.02,18.68), times=2)
+
+for(i in 1:6){
+	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,23.5), ylim=c(0,0.115), pch=19, axes=F)
+	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0)
+	box()
+	abline(h=0.05, lty=2, col="grey")
+	if(i %in% c(1,4)){axis(2, at=c(0,0.04,0.08, 0.12), tck=-0.03)}
+	if(i %in% c(4,5,6)){axis(1, at=c(1:5,7:11,13:17, 19:23), tck=-0.03, labels=rep(c("1","2","3","4","5"), times=4), cex.axis=0.7)}
+	#mtext(letters[i], side=3, line=-1.3, adj=0.02, font=2)
+	for(j in 2:length(size[i,])){
+		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19)
+		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0)
+		abline(v=6*(j-1), lty=2, col="grey")
+	}
+	points(error.varytau[i,]~c(19:23), pch=19)
+	arrows(x0=c(19:23), y0=error.varytau[i,]-error.ci.varytau[i,], y1=error.varytau[i,]+error.ci.varytau[i,], length=0)
+	abline(v=18, lty=2, col="grey")
+	mtext(paste0("Mean:",paper.mean[i]),side=1,adj=0.95,line=-2.3, cex=0.75)
+	mtext(paste0("SD:",paper.sd[i]),side=1, adj=0.95,line=-1.3, cex=0.75)
+	mtext(expression(tau==0.1), side=3, adj=0.06, cex=0.8, line=-1.4)
+	mtext(expression(tau==0.5), side=3, adj=0.35, cex=0.8, line=-1.4)
+	mtext(expression(tau==0.1), side=3, adj=0.64, cex=0.8, line=-1.4)
+	mtext(expression(tau==0.1-1), side=3, adj=0.98, cex=0.77, line=-1.4)
+	if(i %in% c(1,2,3)){mtext(expression(rho==0.1-0.4), side=1, adj=0.5, cex=0.8, line=-1.3)}
+	if(i %in% c(4,5,6)){mtext(expression(rho==0.6-0.9), side=1, adj=0.5, cex=0.8, line=-1.3)}
+}
+
+#Label each section of figures with the type of non-independence#
+mtext("Experiment 1: equally correlated studies", outer=T, line=0.5, font=2, adj=1)
+mtext("Experiment 2: Unequally correlated studies", outer=T, line=-46.8, font=2, adj=1)
+
+#Label axes#
+mtext("Error rate", side=2, outer=T, line=2.5, font=2)
+mtext("Meta-analysis methods", side=1, outer=T, line=2.5, font=2)
