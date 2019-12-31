@@ -44,7 +44,7 @@ for(i in 1:3){
 	if(i == 1){axis(2, at=c(0,0.04,0.08), tck=-0.03)}
 	for(j in 2:length(size[i,])){
 		#Plot subsequent scenarios equally spaced on the figure#
-		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19)\\
+		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19)
 		#Plot error bar#
 		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0)
 		abline(v=6*(j-1), lty=2, col="grey")
@@ -54,6 +54,7 @@ for(i in 1:3){
 	mtext(expression(tau==0.1), side=3, adj=0.1, cex=0.8, line=-1.4)
 	mtext(expression(tau==0.5), side=3, adj=0.5, cex=0.8, line=-1.4)
 	mtext(expression(tau==1), side=3, adj=0.9, cex=0.8, line=-1.4)
+	mtext(expression(rho==0), side=1, adj=0.5, cex=0.8, line=-1.3)
 }
 
 
