@@ -1,8 +1,11 @@
 #Define the layout of multiple panel figure using layout matrix#
-layout.mat = rbind(c(1:3),c(1:3),c(1:3),c(4:6),c(4:6),c(4:6),c(7:9),c(7:9),c(7:9),c(10:12),c(10:12),c(10:12),c(19:21),c(13:15),c(13:15),c(13:15),c(16:18),c(16:18),c(16:18))
+layout.mat = rbind(c(1:3),c(1:3),c(1:3),c(22:24),c(4:6),c(4:6),c(4:6),c(7:9),c(7:9),c(7:9),c(10:12),c(10:12),c(10:12),c(19:21),c(13:15),c(13:15),c(13:15),c(16:18),c(16:18),c(16:18))
+
+#Specify color of points for each method#
+method.col = c(rgb(0,0,0),rgb(0.9,0.6,0),rgb(0.8,0.4,0),rgb(0,0.45,0.7),rgb(0.35,0.7,0.9))
 
 #Set up plotting device and figure margins#
-quartz(w=9, h=10)
+quartz(w=9.5, h=11)
 layout(mat=layout.mat)
 par(mar=c(0,0,0,0), oma=c(4,4,3,2))
 
@@ -37,16 +40,16 @@ paper.mean = c(1.5,5.5,15.5)
 paper.sd = c(1.11,7.02,18.68)
 
 for(i in 1:3){
-	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,6*(scenario/3-1)+5.5), ylim=c(0,0.11), pch=19, axes=F)
-	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0)
+	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,6*(scenario/3-1)+5.5), ylim=c(0,0.11), pch=19, axes=F, , col=method.col)
+	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0, , col=method.col)
 	box()
 	abline(h=0.05, lty=2, col="grey")
 	if(i == 1){axis(2, at=c(0,0.04,0.08), tck=-0.03)}
 	for(j in 2:length(size[i,])){
 		#Plot subsequent scenarios equally spaced on the figure#
-		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19)
+		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19, col=method.col)
 		#Plot error bar#
-		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0)
+		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0, col=method.col)
 		abline(v=6*(j-1), lty=2, col="grey")
 	}
 	mtext(paste0("Mean:",paper.mean[i]),side=1,adj=0.95,line=-2.3, cex=0.75)
@@ -55,6 +58,7 @@ for(i in 1:3){
 	mtext(expression(tau==0.5), side=3, adj=0.5, cex=0.8, line=-1.4)
 	mtext(expression(tau==1), side=3, adj=0.9, cex=0.8, line=-1.4)
 	mtext(expression(rho==0), side=1, adj=0.5, cex=0.8, line=-1.3)
+	mtext(paste0("(",LETTERS[i],")"), side=1, adj=0.02, line=-1.35, cex=0.75)
 }
 
 
@@ -88,16 +92,25 @@ paper.mean = rep(c(1.5,5.5,15.5), times=3)
 paper.sd = rep(c(1.11,7.02,18.68), times=3)
 
 for(i in 1:9){
-	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,17.5), ylim=c(0,0.11), pch=19, axes=F)
-	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0)
+	if(error[size[i,1],1]>0.085){
+		rate = error[size[i,1],1]
+		error[size[i,1],1] = 0.5
+	}
+	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,17.5), ylim=c(0,0.11), pch=19, axes=F, col=method.col)
+	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0, col=method.col)
+	if(error[size[i,1],1]>0.085){text(x=1, y=0.06, labels=paste0(round(100*rate,0),"%"), cex=0.85)}
 	box()
 	abline(h=0.05, lty=2, col="grey")
 	if(i %in% c(1,4,7)){axis(2, at=c(0,0.04, 0.08), tck=-0.03)}
-	if(i %in% c(7,8,9)){axis(1, at=c(1:5,7:11,13:17), tck=-0.03, labels=rep(c("1","2","3","4","5"), times=3), cex.axis=0.8)}
 	for(j in 2:length(size[i,])){
-		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19)
-		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0)
+		if(error[size[i,j],1]>0.085){
+		rate = error[size[i,j],1]
+		error[size[i,j],1] = 0.5
+		}
+		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19, col=method.col)
+		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0, col=method.col)
 		abline(v=6*(j-1), lty=2, col="grey")
+		if(error[size[i,j],1]>0.085){text(x=(j-1)*6+1, y=0.06, labels=paste0(round(100*rate,0),"%"), cex=0.85)}
 	}
 	mtext(paste0("Mean:",paper.mean[i]),side=1,adj=0.95,line=-2.3, cex=0.75)
 	mtext(paste0("SD:",paper.sd[i]),side=1, adj=0.95,line=-1.3, cex=0.75)
@@ -107,6 +120,7 @@ for(i in 1:9){
 	if(i %in% c(1,2,3)){mtext(expression(rho==0.1), side=1, adj=0.5, cex=0.8, line=-1.3)}
 	if(i %in% c(4,5,6)){mtext(expression(rho==0.5), side=1, adj=0.5, cex=0.8, line=-1.3)}
 	if(i %in% c(7,8,9)){mtext(expression(rho==0.9), side=1, adj=0.5, cex=0.8, line=-1.3)}
+	mtext(paste0("(",LETTERS[3+i],")"), side=1, adj=0.02, line=-1.35, cex=0.75)
 }
 
 
@@ -150,35 +164,54 @@ paper.mean = rep(c(1.5,5.5,15.5), times=2)
 paper.sd = rep(c(1.11,7.02,18.68), times=2)
 
 for(i in 1:6){
-	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,23.5), ylim=c(0,0.115), pch=19, axes=F)
-	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0)
+	if(error[size[i,1],1]>0.085){ #If error rate of method 1 too big to show, plot the value on the figure#
+		rate = error[size[i,1],1]
+		error[size[i,1],1] = 999
+	}
+	plot(error[size[i,1],]~c(1:5), xlim=c(0.5,23.5), ylim=c(0,0.115), pch=19, axes=F, col=method.col)
+	arrows(x0=c(1:5),y0=error[size[i,1],]-error.ci[size[i,1],],y1=error[size[i,1],]+error.ci[size[i,1],], length=0, col=method.col)
 	box()
 	abline(h=0.05, lty=2, col="grey")
+	#Directly note value of error rate if too high to show on figure#
+	if(error[size[i,1],1]>0.085){text(x=1, y=0.06, labels=paste0(round(100*rate,0),"%"), cex=0.85)}
 	if(i %in% c(1,4)){axis(2, at=c(0,0.04,0.08, 0.12), tck=-0.03)}
-	if(i %in% c(4,5,6)){axis(1, at=c(1:5,7:11,13:17, 19:23), tck=-0.03, labels=rep(c("1","2","3","4","5"), times=4), cex.axis=0.7)}
-	#mtext(letters[i], side=3, line=-1.3, adj=0.02, font=2)
 	for(j in 2:length(size[i,])){
-		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19)
-		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0)
+		if(error[size[i,j],1]>0.085){
+		rate = error[size[i,j],1]
+		error[size[i,j],1] = 0.5
+		}
+		points(error[size[i,j],]~c(((j-1)*6+1):((j-1)*6+5)), pch=19, col=method.col)
+		arrows(x0=c(((j-1)*6+1):((j-1)*6+5)), y0=error[size[i,j],]-error.ci[size[i,j],], y1=error[size[i,j],]+error.ci[size[i,j],], length=0, col=method.col)
 		abline(v=6*(j-1), lty=2, col="grey")
+		if(error[size[i,j],1]>0.085){text(x=(j-1)*6+1, y=0.06, labels=paste0(round(100*rate,0),"%"), cex=0.85)}
 	}
-	points(error.varytau[i,]~c(19:23), pch=19)
-	arrows(x0=c(19:23), y0=error.varytau[i,]-error.ci.varytau[i,], y1=error.varytau[i,]+error.ci.varytau[i,], length=0)
+	if(error.varytau[i,1]>0.085){
+		rate = error.varytau[i,1]
+		error.varytau[i,1] = 0.5
+	}
+	points(error.varytau[i,]~c(19:23), pch=19, col=method.col)
+	arrows(x0=c(19:23), y0=error.varytau[i,]-error.ci.varytau[i,], y1=error.varytau[i,]+error.ci.varytau[i,], length=0, col=method.col)
+	if(error.varytau[i,1]>0.08){text(x=19, y=0.06, labels=paste0(round(100*rate,0),"%"), cex=0.85)}
 	abline(v=18, lty=2, col="grey")
 	mtext(paste0("Mean:",paper.mean[i]),side=1,adj=0.95,line=-2.3, cex=0.75)
 	mtext(paste0("SD:",paper.sd[i]),side=1, adj=0.95,line=-1.3, cex=0.75)
 	mtext(expression(tau==0.1), side=3, adj=0.06, cex=0.8, line=-1.4)
 	mtext(expression(tau==0.5), side=3, adj=0.35, cex=0.8, line=-1.4)
-	mtext(expression(tau==0.1), side=3, adj=0.64, cex=0.8, line=-1.4)
+	mtext(expression(tau==1), side=3, adj=0.64, cex=0.8, line=-1.4)
 	mtext(expression(tau==0.1-1), side=3, adj=0.98, cex=0.77, line=-1.4)
 	if(i %in% c(1,2,3)){mtext(expression(rho==0.1-0.4), side=1, adj=0.5, cex=0.8, line=-1.3)}
 	if(i %in% c(4,5,6)){mtext(expression(rho==0.6-0.9), side=1, adj=0.5, cex=0.8, line=-1.3)}
+	mtext(paste0("(",LETTERS[12+i],")"), side=1, adj=0.02, line=-1.35, cex=0.75)
 }
 
 #Label each section of figures with the type of non-independence#
-mtext("Experiment 1: equally correlated studies", outer=T, line=0.5, font=2, adj=1)
-mtext("Experiment 2: Unequally correlated studies", outer=T, line=-46.8, font=2, adj=1)
+mtext("Experiment 1: independent studies", outer=T, line=0.5, font=2, adj=1)
+mtext("Experiment 1: equally correlated studies", outer=T, line=-14.8, font=2, adj=1)
+mtext("Experiment 2: unequally correlated studies", outer=T, line=-53.1, font=2, adj=1)
 
 #Label axes#
 mtext("Error rate", side=2, outer=T, line=2.5, font=2)
-mtext("Meta-analysis methods", side=1, outer=T, line=2.5, font=2)
+
+#Legends#
+mtext("Methods:", outer=T, line=0.5, font=2, adj=0, cex=0.95)
+legend("topleft", legend=c("1","2","3","4","5"), pch=19, xpd=NA, inset=c(-1.75,-5.88), bty="n", horiz=T, cex=1.35, col=method.col)
