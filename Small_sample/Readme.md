@@ -1,3 +1,5 @@
+This repository contains files for the simulation experiments examining the effect of small sample size in meta-analysis. This is work in progress and thus code and results may change over time.
+
 The repository contains two folders:
 * **Simulation**: this folder contains four R code files for the simulation experiments described in the paper. The file names indicate the structure of non-independence contained in the simulation. Specifically, "Independent.R" is the simulations assuming independence among observed effect sizes within the same paper. "EqualCorr.R" is the simulations assuming equal correlation among observed effect sizes within the same paper. "UnequalCorr.R" is the simulations assuming unequal correlation among observed effect sizes within the paper but the among study variance is kept constant across papers. Finally, "CorrCvine.R" implements a function used to generate correlation matrix used in cases of unequal correlation. This code is called in "UnequalStudy.R"
 
