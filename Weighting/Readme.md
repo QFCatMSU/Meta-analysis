@@ -1,0 +1,1 @@
+This folder contains code for the following manuscript: Song, C., S. D. Peacor, C. W. Osenberg, A. A. Briggs, and J. R. Bence (20XX) Weighting is likely overweighted in ecological meta-analyses. XXXXXXX, XX(XX): XXX--XXX. Please contact the corresponding author Chao Song (chaosong@msu.edu) if you have any questions.
