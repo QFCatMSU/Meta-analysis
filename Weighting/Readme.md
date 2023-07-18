@@ -1,14 +1,5 @@
-This folder contains code for the following manuscript: Song, C., S. D. Peacor, C. W. Osenberg, A. A. Briggs, and J. R. Bence (20XX) Weighting is likely overweighted in ecological meta-analyses. XXXXXXX, XX(XX): XXX--XXX. Please contact the corresponding author Chao Song (chaosong@msu.edu) if you have any questions.
-
 The repository contains the following files:
 
-* **VarSigma_I2_RE.R**: Simulation code for comparison of weighted and unweighed analyses in simple random-effect models;
-* **VarSigma_I2_HIER.R**: Simulation code for comparison of weighted and unweighted analyses in hierarchical models;
+**Ha_I2_XXXX_YYYY.R**: R code files for comparing precision between various methods (indicated in the file name by YYYY) and the inverse variance weighted analysis in random effects or hierarchical models (indicated in the file name by XXXX);
 
-* **SampleMiss_RE**: Simulation code for evaluating the effects of reduced sample size in weighted analyses in random effect model;
-
-* **SampleMiss HIER.R**: Simulation code for evaluating the effects of reduced sample size in weighted analysis in hierarchical models;
-
-* **N_distribution.csv**: Number of within-study replicates in 10 published ecological meta-analyses;
-
-* **CV_distribution.csv**: Coefficient of variation of the response in control and treatment in 10 published ecological meta-analyses.
+**missing_XXXX_YYYY**: R code files for comparing precision between various methods (indicated in the file name by YYYY) and the inverse variance weighted analysis in random effects or hierarchical models (indicated in the file name by XXXX) under various proportion of studies without complete information for calculation of within-study variance. These analyses were eventually used to idenfity the threshold proportion of missing within-study variance above which weighted analysis using complete cases are less precise.
